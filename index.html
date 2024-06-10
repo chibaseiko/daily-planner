@@ -30,6 +30,7 @@
             grid-column: span 2;
             text-align: center;
             margin-bottom: 20px;
+            padding-top: 20px;
             position: relative;
         }
         .planner-header h1 {
@@ -150,6 +151,10 @@
             background-color: #FF5722;
             margin-left: 10px;
         }
+        .clock-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -161,10 +166,15 @@
         </div>
         
         <div class="section">
-            <h2>Today's Schedule</h2>
+            <h2>Deadline Reminders</h2>
             <div id="schedule">
-                <!-- Initial time slot, will be populated dynamically -->
+                <div class="time-slot">
+                    <span class="clock-icon">⏰</span>
+                    <input type="text" placeholder="Enter deadline">
+                    <input type="text" placeholder="Enter task">
+                </div>
             </div>
+            <button class="add-button" onclick="addDeadline()">Add Deadline</button>
         </div>
         
         <div class="section">
@@ -174,7 +184,6 @@
                     <textarea placeholder="Enter your task"></textarea>
                     <button class="add-button" onclick="addSubTask(this)">Add Subtask</button>
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
-                    <button class="move-button" onclick="moveToTodoList(this)">Move to To-Do List</button>
                     <ul class="sub-task-list"></ul>
                 </li>
             </ul>
@@ -233,16 +242,11 @@
             removeButton.classList.add('remove-button');
             removeButton.innerText = 'Remove';
             removeButton.onclick = function() { removeTask(this); };
-            const moveButton = document.createElement('button');
-            moveButton.classList.add('move-button');
-            moveButton.innerText = 'Move to To-Do List';
-            moveButton.onclick = function() { moveToTodoList(this); };
             const subTaskList = document.createElement('ul');
             subTaskList.classList.add('sub-task-list');
             newTask.appendChild(input);
             newTask.appendChild(addButton);
             newTask.appendChild(removeButton);
-            newTask.appendChild(moveButton);
             newTask.appendChild(subTaskList);
             list.appendChild(newTask);
             updateTimeSlots();
@@ -276,6 +280,24 @@
             notesElement.appendChild(newNote);
         }
 
+        function addDeadline() {
+            const newDeadline = document.createElement('div');
+            newDeadline.classList.add('time-slot');
+            const clockIcon = document.createElement('span');
+            clockIcon.classList.add('clock-icon');
+            clockIcon.innerHTML = '⏰';
+            const timeInput = document.createElement('input');
+            timeInput.type = 'text';
+            timeInput.placeholder = 'Enter deadline';
+            const taskInput = document.createElement('input');
+            taskInput.type = 'text';
+            taskInput.placeholder = 'Enter task';
+            newDeadline.appendChild(clockIcon);
+            newDeadline.appendChild(timeInput);
+            newDeadline.appendChild(taskInput);
+            scheduleElement.appendChild(newDeadline);
+        }
+
         function removeTask(button) {
             const task = button.parentElement;
             task.remove();
@@ -290,16 +312,12 @@
         }
 
         function updateTimeSlots() {
-            scheduleElement.innerHTML = '';
-            const tasks = document.querySelectorAll('#priorityTasks > li, #todoTasks > li');
-            tasks.forEach((task, index) => {
-                const timeSlot = document.createElement('div');
-                timeSlot.classList.add('time-slot');
-                const timeInput = document.createElement('input');
-                timeInput.type = 'text';
-                timeInput.placeholder = `Time Slot ${index + 1}`;
-                timeSlot.appendChild(timeInput);
-                scheduleElement.appendChild(timeSlot);
+            const deadlines = document.querySelectorAll('#schedule .time-slot');
+            deadlines.forEach((deadline, index) => {
+                const timeInput = deadline.querySelector('input[type="text"]:nth-child(2)');
+                const taskInput = deadline.querySelector('input[type="text"]:nth-child(3)');
+                timeInput.placeholder = `Deadline ${index + 1}`;
+                taskInput.placeholder = `Task ${index + 1}`;
             });
         }
 
@@ -309,8 +327,10 @@
             localStorage.setItem('currentDate', date);
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
-                const timeInput = timeSlot.querySelector('input[type="text"]');
+                const timeInput = timeSlot.querySelector('input[type="text"]:nth-child(2)');
+                const taskInput = timeSlot.querySelector('input[type="text"]:nth-child(3)');
                 localStorage.setItem(`schedule-${date}-${i}-time`, timeInput.value);
+                localStorage.setItem(`schedule-${date}-${i}-task`, taskInput.value);
             }
             saveList('priorityTasks', date);
             saveList('todoTasks', date);
@@ -340,8 +360,10 @@
             weekdayElement.innerText = dayOfWeek;
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
-                const timeInput = timeSlot.querySelector('input[type="text"]');
+                const timeInput = timeSlot.querySelector('input[type="text"]:nth-child(2)');
+                const taskInput = timeSlot.querySelector('input[type="text"]:nth-child(3)');
                 timeInput.value = localStorage.getItem(`schedule-${date}-${i}-time`) || '';
+                taskInput.value = localStorage.getItem(`schedule-${date}-${i}-task`) || '';
             }
             loadList('priorityTasks', date);
             loadList('todoTasks', date);
@@ -363,17 +385,12 @@
                 removeButton.classList.add('remove-button');
                 removeButton.innerText = 'Remove';
                 removeButton.onclick = function() { removeTask(this); };
-                const moveButton = document.createElement('button');
-                moveButton.classList.add('move-button');
-                moveButton.innerText = 'Move to To-Do List';
-                moveButton.onclick = function() { moveToTodoList(this); };
                 const subTaskList = document.createElement('ul');
                 subTaskList.classList.add('sub-task-list');
                 input.value = localStorage.getItem(`${listId}-${date}-${i}`);
                 newTask.appendChild(input);
                 newTask.appendChild(addButton);
                 newTask.appendChild(removeButton);
-                newTask.appendChild(moveButton);
                 newTask.appendChild(subTaskList);
                 list.appendChild(newTask);
                 let j = 0;
@@ -400,9 +417,12 @@
                 const date = noteDateElement.value || new Date().toISOString().split('T')[0];
                 for (let i = 0; i < scheduleElement.children.length; i++) {
                     const timeSlot = scheduleElement.children[i];
-                    const timeInput = timeSlot.querySelector('input[type="text"]');
+                    const timeInput = timeSlot.querySelector('input[type="text"]:nth-child(2)');
+                    const taskInput = timeSlot.querySelector('input[type="text"]:nth-child(3)');
                     timeInput.value = '';
+                    taskInput.value = '';
                     localStorage.removeItem(`schedule-${date}-${i}-time`);
+                    localStorage.removeItem(`schedule-${date}-${i}-task`);
                 }
                 clearList('priorityTasks', date);
                 clearList('todoTasks', date);
