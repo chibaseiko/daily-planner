@@ -6,8 +6,12 @@
     <title>Online Daily Planner</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        .section { margin-bottom: 20px; }
-        textarea { width: 100%; height: 100px; margin-top: 5px; }
+        .section { margin-bottom: 20px; padding: 10px; border-radius: 5px; }
+        .morning { background-color: #FFEBEE; }
+        .forenoon { background-color: #FFF3E0; }
+        .afternoon { background-color: #E8F5E9; }
+        .evening { background-color: #E3F2FD; }
+        textarea { width: 100%; height: 50px; margin-top: 5px; display: block; }
         input[type="date"] { margin-top: 10px; }
         button { margin-top: 10px; }
     </style>
@@ -16,24 +20,24 @@
     <h1>Daily Planner</h1>
     <input type="date" id="noteDate">
     
-    <div class="section">
+    <div class="section morning">
         <h2>Morning</h2>
-        <textarea id="morningNote" placeholder="Write your morning notes here..."></textarea>
+        <div id="morningNotes"></div>
     </div>
     
-    <div class="section">
+    <div class="section forenoon">
         <h2>Forenoon</h2>
-        <textarea id="forenoonNote" placeholder="Write your forenoon notes here..."></textarea>
+        <div id="forenoonNotes"></div>
     </div>
     
-    <div class="section">
-        <h2>Noon</h2>
-        <textarea id="noonNote" placeholder="Write your noon notes here..."></textarea>
-    </div>
-    
-    <div class="section">
+    <div class="section afternoon">
         <h2>Afternoon</h2>
-        <textarea id="afternoonNote" placeholder="Write your afternoon notes here..."></textarea>
+        <div id="afternoonNotes"></div>
+    </div>
+    
+    <div class="section evening">
+        <h2>Evening</h2>
+        <div id="eveningNotes"></div>
     </div>
     
     <button onclick="saveNotes()">Save</button>
@@ -41,44 +45,69 @@
 
     <script>
         const noteDateElement = document.getElementById('noteDate');
-        const morningNoteElement = document.getElementById('morningNote');
-        const forenoonNoteElement = document.getElementById('forenoonNote');
-        const noonNoteElement = document.getElementById('noonNote');
-        const afternoonNoteElement = document.getElementById('afternoonNote');
+        const morningNotesElement = document.getElementById('morningNotes');
+        const forenoonNotesElement = document.getElementById('forenoonNotes');
+        const afternoonNotesElement = document.getElementById('afternoonNotes');
+        const eveningNotesElement = document.getElementById('eveningNotes');
+
+        function createNoteFields(sectionElement, sectionName) {
+            for (let i = 1; i <= 5; i++) {
+                const noteDiv = document.createElement('div');
+                const textarea = document.createElement('textarea');
+                textarea.id = `${sectionName}Note${i}`;
+                textarea.placeholder = `Write your ${sectionName} note ${i} here...`;
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `${sectionName}Checkbox${i}`;
+                noteDiv.appendChild(textarea);
+                noteDiv.appendChild(checkbox);
+                sectionElement.appendChild(noteDiv);
+            }
+        }
 
         function loadNotes() {
             const date = noteDateElement.value || new Date().toISOString().split('T')[0];
-            morningNoteElement.value = localStorage.getItem(`morningNote-${date}`) || '';
-            forenoonNoteElement.value = localStorage.getItem(`forenoonNote-${date}`) || '';
-            noonNoteElement.value = localStorage.getItem(`noonNote-${date}`) || '';
-            afternoonNoteElement.value = localStorage.getItem(`afternoonNote-${date}`) || '';
+            ['morning', 'forenoon', 'afternoon', 'evening'].forEach(sectionName => {
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById(`${sectionName}Note${i}`).value = localStorage.getItem(`${sectionName}Note${i}-${date}`) || '';
+                    document.getElementById(`${sectionName}Checkbox${i}`).checked = localStorage.getItem(`${sectionName}Checkbox${i}-${date}`) === 'true';
+                }
+            });
         }
 
         function saveNotes() {
             const date = noteDateElement.value || new Date().toISOString().split('T')[0];
-            localStorage.setItem(`morningNote-${date}`, morningNoteElement.value);
-            localStorage.setItem(`forenoonNote-${date}`, forenoonNoteElement.value);
-            localStorage.setItem(`noonNote-${date}`, noonNoteElement.value);
-            localStorage.setItem(`afternoonNote-${date}`, afternoonNoteElement.value);
+            ['morning', 'forenoon', 'afternoon', 'evening'].forEach(sectionName => {
+                for (let i = 1; i <= 5; i++) {
+                    localStorage.setItem(`${sectionName}Note${i}-${date}`, document.getElementById(`${sectionName}Note${i}`).value);
+                    localStorage.setItem(`${sectionName}Checkbox${i}-${date}`, document.getElementById(`${sectionName}Checkbox${i}`).checked);
+                }
+            });
             alert('Notes saved!');
         }
 
         function clearNotes() {
             if (confirm('Are you sure you want to clear the notes?')) {
                 const date = noteDateElement.value || new Date().toISOString().split('T')[0];
-                morningNoteElement.value = '';
-                forenoonNoteElement.value = '';
-                noonNoteElement.value = '';
-                afternoonNoteElement.value = '';
-                localStorage.removeItem(`morningNote-${date}`);
-                localStorage.removeItem(`forenoonNote-${date}`);
-                localStorage.removeItem(`noonNote-${date}`);
-                localStorage.removeItem(`afternoonNote-${date}`);
+                ['morning', 'forenoon', 'afternoon', 'evening'].forEach(sectionName => {
+                    for (let i = 1; i <= 5; i++) {
+                        document.getElementById(`${sectionName}Note${i}`).value = '';
+                        document.getElementById(`${sectionName}Checkbox${i}`).checked = false;
+                        localStorage.removeItem(`${sectionName}Note${i}-${date}`);
+                        localStorage.removeItem(`${sectionName}Checkbox${i}-${date}`);
+                    }
+                });
             }
         }
 
         noteDateElement.addEventListener('change', loadNotes);
-        document.addEventListener('DOMContentLoaded', loadNotes);
+        document.addEventListener('DOMContentLoaded', () => {
+            createNoteFields(morningNotesElement, 'morning');
+            createNoteFields(forenoonNotesElement, 'forenoon');
+            createNoteFields(afternoonNotesElement, 'afternoon');
+            createNoteFields(eveningNotesElement, 'evening');
+            loadNotes();
+        });
     </script>
 </body>
 </html>
