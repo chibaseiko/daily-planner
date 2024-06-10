@@ -6,32 +6,79 @@
     <title>Online Daily Planner</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        textarea { width: 100%; height: 200px; }
+        .section { margin-bottom: 20px; }
+        textarea { width: 100%; height: 100px; margin-top: 5px; }
+        input[type="date"] { margin-top: 10px; }
         button { margin-top: 10px; }
     </style>
 </head>
 <body>
     <h1>Daily Planner</h1>
-    <textarea id="note" placeholder="Write your notes here..."></textarea>
-    <br>
-    <button onclick="saveNote()">Save</button>
-    <button onclick="clearNote()">Clear</button>
+    <input type="date" id="noteDate">
+    
+    <div class="section">
+        <h2>Morning</h2>
+        <textarea id="morningNote" placeholder="Write your morning notes here..."></textarea>
+    </div>
+    
+    <div class="section">
+        <h2>Forenoon</h2>
+        <textarea id="forenoonNote" placeholder="Write your forenoon notes here..."></textarea>
+    </div>
+    
+    <div class="section">
+        <h2>Noon</h2>
+        <textarea id="noonNote" placeholder="Write your noon notes here..."></textarea>
+    </div>
+    
+    <div class="section">
+        <h2>Afternoon</h2>
+        <textarea id="afternoonNote" placeholder="Write your afternoon notes here..."></textarea>
+    </div>
+    
+    <button onclick="saveNotes()">Save</button>
+    <button onclick="clearNotes()">Clear</button>
 
     <script>
-        document.getElementById('note').value = localStorage.getItem('dailyNote') || '';
+        const noteDateElement = document.getElementById('noteDate');
+        const morningNoteElement = document.getElementById('morningNote');
+        const forenoonNoteElement = document.getElementById('forenoonNote');
+        const noonNoteElement = document.getElementById('noonNote');
+        const afternoonNoteElement = document.getElementById('afternoonNote');
 
-        function saveNote() {
-            const note = document.getElementById('note').value;
-            localStorage.setItem('dailyNote', note);
-            alert('Note saved!');
+        function loadNotes() {
+            const date = noteDateElement.value || new Date().toISOString().split('T')[0];
+            morningNoteElement.value = localStorage.getItem(`morningNote-${date}`) || '';
+            forenoonNoteElement.value = localStorage.getItem(`forenoonNote-${date}`) || '';
+            noonNoteElement.value = localStorage.getItem(`noonNote-${date}`) || '';
+            afternoonNoteElement.value = localStorage.getItem(`afternoonNote-${date}`) || '';
         }
 
-        function clearNote() {
-            if (confirm('Are you sure you want to clear the note?')) {
-                document.getElementById('note').value = '';
-                localStorage.removeItem('dailyNote');
+        function saveNotes() {
+            const date = noteDateElement.value || new Date().toISOString().split('T')[0];
+            localStorage.setItem(`morningNote-${date}`, morningNoteElement.value);
+            localStorage.setItem(`forenoonNote-${date}`, forenoonNoteElement.value);
+            localStorage.setItem(`noonNote-${date}`, noonNoteElement.value);
+            localStorage.setItem(`afternoonNote-${date}`, afternoonNoteElement.value);
+            alert('Notes saved!');
+        }
+
+        function clearNotes() {
+            if (confirm('Are you sure you want to clear the notes?')) {
+                const date = noteDateElement.value || new Date().toISOString().split('T')[0];
+                morningNoteElement.value = '';
+                forenoonNoteElement.value = '';
+                noonNoteElement.value = '';
+                afternoonNoteElement.value = '';
+                localStorage.removeItem(`morningNote-${date}`);
+                localStorage.removeItem(`forenoonNote-${date}`);
+                localStorage.removeItem(`noonNote-${date}`);
+                localStorage.removeItem(`afternoonNote-${date}`);
             }
         }
+
+        noteDateElement.addEventListener('change', loadNotes);
+        document.addEventListener('DOMContentLoaded', loadNotes);
     </script>
 </body>
 </html>
