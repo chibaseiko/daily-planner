@@ -33,7 +33,7 @@
             text-align: center;
             margin-bottom: 20px;
             padding-top: 20px;
-            background-color: #333;
+            background-color: #4CAF50;
             color: #fff;
             border-radius: 10px;
             padding: 10px;
@@ -56,7 +56,7 @@
         .planner-header .weekday {
             margin-top: 5px;
             font-size: 20px;
-            color: #ccc;
+            color: #fff;
         }
         .section {
             background-color: #fff;
@@ -142,6 +142,7 @@
             margin-left: 10px;
             resize: vertical;
             border: 2px solid #ccc; /* 添加边框 */
+            width: calc(100% - 80px); /* 保持宽度一致 */
         }
         .task-list li input[type="checkbox"], .note-list li input[type="checkbox"] {
             margin-left: 10px;
@@ -217,6 +218,7 @@
             margin-left: 10px;
             resize: vertical; /* 允许垂直调整大小 */
             border: 2px solid #ccc; /* 添加边框 */
+            width: calc(100% - 180px); /* 保持宽度一致 */
         }
     </style>
 </head>
@@ -228,7 +230,7 @@
             <div class="weekday" id="weekday"></div>
         </div>
         
-        <div class="section">
+        <div class="section" style="background-color: #FFEBEE;">
             <h2>Deadline Reminders</h2>
             <button class="add-button" id="addDeadlineButton">Add Deadline</button>
             <div id="schedule"></div>
@@ -237,7 +239,7 @@
             </div>
         </div>
         
-        <div class="section">
+        <div class="section" style="background-color: #E3F2FD;">
             <h2>Top Priority</h2>
             <button class="add-button" id="addPriorityTaskButton">Add Task</button>
             <ul class="task-list" id="priorityTasks"></ul>
@@ -247,7 +249,7 @@
             </div>
         </div>
         
-        <div class="section">
+        <div class="section" style="background-color: #E8F5E9;">
             <h2>To-Do List</h2>
             <button class="add-button" id="addTodoTaskButton">Add Task</button>
             <ul class="task-list" id="todoTasks"></ul>
@@ -256,8 +258,8 @@
             </div>
         </div>
         
-        <div class="section">
-            <h2>Notes/Reminders</h2>
+        <div class="section" style="background-color: #FFF3E0;">
+            <h2>Notes</h2>
             <button class="add-button" id="addNoteButton">Add Note</button>
             <ul class="note-list" id="notes"></ul>
             <div class="section-buttons">
