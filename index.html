@@ -36,14 +36,6 @@
             font-size: 24px;
             color: #333;
         }
-        .planner-header input[type="text"] {
-            margin-top: 10px;
-            padding: 5px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            font-size: 18px;
-            text-align: center;
-        }
         .planner-header input[type="date"] {
             margin-top: 10px;
             padding: 5px;
@@ -100,6 +92,17 @@
             border-radius: 5px;
             border: 1px solid #ddd;
             margin-left: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .task-list li textarea {
+            flex: 1;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-left: 10px;
+            resize: vertical;
         }
         .buttons {
             text-align: center;
@@ -135,7 +138,6 @@
 <body>
     <div class="planner-container">
         <div class="planner-header">
-            <input type="text" id="userName" placeholder="Enter your name">
             <h1 id="plannerTitle">Daily Schedule Planner</h1>
             <input type="date" id="noteDate">
             <div class="weekday" id="weekday"></div>
@@ -152,7 +154,7 @@
             <h2>Top Priority</h2>
             <ul class="task-list" id="priorityTasks">
                 <li>
-                    <input type="text" placeholder="Enter your task">
+                    <textarea placeholder="Enter your task"></textarea>
                     <button class="add-button" onclick="addSubTask(this)">Add Subtask</button>
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
                     <button class="move-button" onclick="moveToTodoList(this)">Move to To-Do List</button>
@@ -166,7 +168,7 @@
             <h2>To-Do List</h2>
             <ul class="task-list" id="todoTasks">
                 <li>
-                    <input type="text" placeholder="Enter your task">
+                    <textarea placeholder="Enter your task"></textarea>
                     <button class="add-button" onclick="addSubTask(this)">Add Subtask</button>
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
                     <ul class="sub-task-list"></ul>
@@ -179,7 +181,7 @@
             <h2>Notes/Reminders</h2>
             <ul class="note-list" id="notes">
                 <li>
-                    <input type="text" placeholder="Enter your note">
+                    <textarea placeholder="Enter your note"></textarea>
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
                 </li>
             </ul>
@@ -193,7 +195,6 @@
     </div>
 
     <script>
-        const userNameElement = document.getElementById('userName');
         const plannerTitleElement = document.getElementById('plannerTitle');
         const noteDateElement = document.getElementById('noteDate');
         const weekdayElement = document.getElementById('weekday');
@@ -205,8 +206,7 @@
         function addTask(listId) {
             const list = document.getElementById(listId);
             const newTask = document.createElement('li');
-            const input = document.createElement('input');
-            input.type = 'text';
+            const input = document.createElement('textarea');
             input.placeholder = 'Enter your task';
             const addButton = document.createElement('button');
             addButton.classList.add('add-button');
@@ -235,8 +235,7 @@
             const task = button.parentElement;
             const subTaskList = task.querySelector('.sub-task-list');
             const newSubTask = document.createElement('li');
-            const input = document.createElement('input');
-            input.type = 'text';
+            const input = document.createElement('textarea');
             input.placeholder = 'Enter your subtask';
             const removeSubButton = document.createElement('button');
             removeSubButton.classList.add('remove-button');
@@ -245,13 +244,11 @@
             newSubTask.appendChild(input);
             newSubTask.appendChild(removeSubButton);
             subTaskList.appendChild(newSubTask);
-            updateTimeSlots();
         }
 
         function addNote() {
             const newNote = document.createElement('li');
-            const input = document.createElement('input');
-            input.type = 'text';
+            const input = document.createElement('textarea');
             input.placeholder = 'Enter your note';
             const removeButton = document.createElement('button');
             removeButton.classList.add('remove-button');
@@ -277,37 +274,26 @@
 
         function updateTimeSlots() {
             scheduleElement.innerHTML = '';
-            const tasks = document.querySelectorAll('#priorityTasks li, #todoTasks li, #priorityTasks .sub-task-list li, #todoTasks .sub-task-list li');
+            const tasks = document.querySelectorAll('#priorityTasks > li, #todoTasks > li');
             tasks.forEach((task, index) => {
                 const timeSlot = document.createElement('div');
                 timeSlot.classList.add('time-slot');
                 const timeInput = document.createElement('input');
                 timeInput.type = 'text';
                 timeInput.placeholder = `Time Slot ${index + 1}`;
-                const scheduleInput = document.createElement('input');
-                scheduleInput.type = 'text';
-                scheduleInput.placeholder = `Task ${index + 1}`;
                 timeSlot.appendChild(timeInput);
-                timeSlot.appendChild(scheduleInput);
                 scheduleElement.appendChild(timeSlot);
             });
         }
 
         function saveNotes() {
-            const userName = userNameElement.value;
-            if (userName) {
-                localStorage.setItem('userName', userName);
-                plannerTitleElement.innerText = `${userName}'s Daily Schedule Planner`;
-            }
             const date = noteDateElement.value || new Date().toISOString().split('T')[0];
             const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
             localStorage.setItem('currentDate', date);
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
                 const timeInput = timeSlot.querySelector('input[type="text"]');
-                const scheduleInput = timeSlot.querySelector('input[type="text"]:nth-child(2)');
                 localStorage.setItem(`schedule-${date}-${i}-time`, timeInput.value);
-                localStorage.setItem(`schedule-${date}-${i}-task`, scheduleInput.value);
             }
             saveList('priorityTasks', date);
             saveList('todoTasks', date);
@@ -319,23 +305,18 @@
             const list = document.getElementById(listId);
             for (let i = 0; i < list.children.length; i++) {
                 const item = list.children[i];
-                const input = item.querySelector('input[type="text"]');
+                const input = item.querySelector('textarea');
                 localStorage.setItem(`${listId}-${date}-${i}`, input.value);
                 const subTaskList = item.querySelector('.sub-task-list');
                 for (let j = 0; j < subTaskList.children.length; j++) {
                     const subTask = subTaskList.children[j];
-                    const subTaskInput = subTask.querySelector('input[type="text"]');
+                    const subTaskInput = subTask.querySelector('textarea');
                     localStorage.setItem(`${listId}-${date}-${i}-subtask-${j}`, subTaskInput.value);
                 }
             }
         }
 
         function loadNotes() {
-            const userName = localStorage.getItem('userName');
-            if (userName) {
-                userNameElement.value = userName;
-                plannerTitleElement.innerText = `${userName}'s Daily Schedule Planner`;
-            }
             const date = noteDateElement.value || localStorage.getItem('currentDate') || new Date().toISOString().split('T')[0];
             noteDateElement.value = date;
             const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
@@ -343,9 +324,7 @@
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
                 const timeInput = timeSlot.querySelector('input[type="text"]');
-                const scheduleInput = timeSlot.querySelector('input[type="text"]:nth-child(2)');
                 timeInput.value = localStorage.getItem(`schedule-${date}-${i}-time`) || '';
-                scheduleInput.value = localStorage.getItem(`schedule-${date}-${i}-task`) || '';
             }
             loadList('priorityTasks', date);
             loadList('todoTasks', date);
@@ -358,8 +337,7 @@
             let i = 0;
             while (localStorage.getItem(`${listId}-${date}-${i}`) !== null) {
                 const newTask = document.createElement('li');
-                const input = document.createElement('input');
-                input.type = 'text';
+                const input = document.createElement('textarea');
                 const addButton = document.createElement('button');
                 addButton.classList.add('add-button');
                 addButton.innerText = 'Add Subtask';
@@ -384,8 +362,7 @@
                 let j = 0;
                 while (localStorage.getItem(`${listId}-${date}-${i}-subtask-${j}`) !== null) {
                     const newSubTask = document.createElement('li');
-                    const subTaskInput = document.createElement('input');
-                    subTaskInput.type = 'text';
+                    const subTaskInput = document.createElement('textarea');
                     const removeSubButton = document.createElement('button');
                     removeSubButton.classList.add('remove-button');
                     removeSubButton.innerText = 'Remove';
@@ -407,11 +384,8 @@
                 for (let i = 0; i < scheduleElement.children.length; i++) {
                     const timeSlot = scheduleElement.children[i];
                     const timeInput = timeSlot.querySelector('input[type="text"]');
-                    const scheduleInput = timeSlot.querySelector('input[type="text"]:nth-child(2)');
                     timeInput.value = '';
-                    scheduleInput.value = '';
                     localStorage.removeItem(`schedule-${date}-${i}-time`);
-                    localStorage.removeItem(`schedule-${date}-${i}-task`);
                 }
                 clearList('priorityTasks', date);
                 clearList('todoTasks', date);
@@ -423,22 +397,18 @@
             const list = document.getElementById(listId);
             for (let i = 0; i < list.children.length; i++) {
                 const item = list.children[i];
-                const input = item.querySelector('input[type="text"]');
+                const input = item.querySelector('textarea');
                 input.value = '';
                 const subTaskList = item.querySelector('.sub-task-list');
                 for (let j = 0; j < subTaskList.children.length; j++) {
                     const subTask = subTaskList.children[j];
-                    const subTaskInput = subTask.querySelector('input[type="text"]');
+                    const subTaskInput = subTask.querySelector('textarea');
                     subTaskInput.value = '';
                     localStorage.removeItem(`${listId}-${date}-${i}-subtask-${j}`);
                 }
                 localStorage.removeItem(`${listId}-${date}-${i}`);
             }
         }
-
-        userNameElement.addEventListener('input', () => {
-            plannerTitleElement.innerText = `${userNameElement.value}'s Daily Schedule Planner`;
-        });
 
         noteDateElement.addEventListener('change', loadNotes);
         document.addEventListener('DOMContentLoaded', loadNotes);
