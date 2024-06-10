@@ -141,6 +141,7 @@
             border: 1px solid #ddd;
             margin-left: 10px;
             resize: vertical;
+            border: 2px solid #ccc; /* 添加边框 */
         }
         .task-list li input[type="checkbox"], .note-list li input[type="checkbox"] {
             margin-left: 10px;
@@ -204,6 +205,18 @@
         .clock-icon {
             font-size: 24px;
             margin-right: 10px;
+        }
+        .time-slot input[type="datetime-local"] {
+            width: 150px; /* 设置时间文本框的宽度 */
+        }
+        .time-slot textarea {
+            flex: 1;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-left: 10px;
+            resize: vertical; /* 允许垂直调整大小 */
+            border: 2px solid #ccc; /* 添加边框 */
         }
     </style>
 </head>
