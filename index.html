@@ -35,6 +35,14 @@
             font-size: 24px;
             color: #333;
         }
+        .planner-header input[type="text"] {
+            margin-top: 10px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 18px;
+            text-align: center;
+        }
         .planner-header input[type="date"] {
             margin-top: 10px;
             padding: 5px;
@@ -113,7 +121,8 @@
 <body>
     <div class="planner-container">
         <div class="planner-header">
-            <h1>Daily Schedule Planner</h1>
+            <input type="text" id="userName" placeholder="Enter your name">
+            <h1 id="plannerTitle">Daily Schedule Planner</h1>
             <input type="date" id="noteDate">
         </div>
         
@@ -170,6 +179,8 @@
     </div>
 
     <script>
+        const userNameElement = document.getElementById('userName');
+        const plannerTitleElement = document.getElementById('plannerTitle');
         const noteDateElement = document.getElementById('noteDate');
         const scheduleElement = document.getElementById('schedule');
         const priorityTasksElement = document.getElementById('priorityTasks');
@@ -195,6 +206,11 @@
         }
 
         function saveNotes() {
+            const userName = userNameElement.value;
+            if (userName) {
+                localStorage.setItem('userName', userName);
+                plannerTitleElement.innerText = `${userName}'s Daily Schedule Planner`;
+            }
             const date = noteDateElement.value || new Date().toISOString().split('T')[0];
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
@@ -221,6 +237,11 @@
         }
 
         function loadNotes() {
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                userNameElement.value = userName;
+                plannerTitleElement.innerText = `${userName}'s Daily Schedule Planner`;
+            }
             const date = noteDateElement.value || new Date().toISOString().split('T')[0];
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
@@ -275,6 +296,10 @@
             }
         }
 
+        userNameElement.addEventListener('input', () => {
+            plannerTitleElement.innerText = `${userNameElement.value}'s Daily Schedule Planner`;
+        });
+        
         noteDateElement.addEventListener('change', loadNotes);
         document.addEventListener('DOMContentLoaded', loadNotes);
     </script>
