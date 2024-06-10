@@ -129,6 +129,10 @@
             background-color: #FFC107;
             margin-left: 10px;
         }
+        .move-button {
+            background-color: #FF5722;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -155,6 +159,7 @@
                     <input type="checkbox">
                     <button class="add-button" onclick="addSubTask(this)">Add Subtask</button>
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
+                    <button class="move-button" onclick="moveToTodoList(this)">Move to To-Do List</button>
                     <ul class="sub-task-list"></ul>
                 </li>
             </ul>
@@ -218,12 +223,17 @@
             removeButton.classList.add('remove-button');
             removeButton.innerText = 'Remove';
             removeButton.onclick = function() { removeTask(this); };
+            const moveButton = document.createElement('button');
+            moveButton.classList.add('move-button');
+            moveButton.innerText = 'Move to To-Do List';
+            moveButton.onclick = function() { moveToTodoList(this); };
             const subTaskList = document.createElement('ul');
             subTaskList.classList.add('sub-task-list');
             newTask.appendChild(input);
             newTask.appendChild(checkbox);
             newTask.appendChild(addButton);
             newTask.appendChild(removeButton);
+            newTask.appendChild(moveButton);
             newTask.appendChild(subTaskList);
             list.appendChild(newTask);
             updateTimeSlots();
@@ -257,6 +267,13 @@
         function removeTask(button) {
             const task = button.parentElement;
             task.remove();
+            updateTimeSlots();
+        }
+
+        function moveToTodoList(button) {
+            const task = button.parentElement;
+            todoTasksElement.appendChild(task);
+            task.querySelector('.move-button').remove();
             updateTimeSlots();
         }
 
@@ -359,6 +376,10 @@
                 removeButton.classList.add('remove-button');
                 removeButton.innerText = 'Remove';
                 removeButton.onclick = function() { removeTask(this); };
+                const moveButton = document.createElement('button');
+                moveButton.classList.add('move-button');
+                moveButton.innerText = 'Move to To-Do List';
+                moveButton.onclick = function() { moveToTodoList(this); };
                 const subTaskList = document.createElement('ul');
                 subTaskList.classList.add('sub-task-list');
                 input.value = localStorage.getItem(`${listId}-${date}-${i}`);
@@ -367,6 +388,7 @@
                 newTask.appendChild(checkbox);
                 newTask.appendChild(addButton);
                 newTask.appendChild(removeButton);
+                newTask.appendChild(moveButton);
                 newTask.appendChild(subTaskList);
                 list.appendChild(newTask);
                 let j = 0;
