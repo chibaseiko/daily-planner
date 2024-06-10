@@ -35,14 +35,22 @@
             padding-top: 20px;
         }
         .planner-header h1 {
-            font-size: 24px;
+            font-size: 32px;
             color: #333;
+            font-weight: bold;
         }
         .planner-header input[type="date"] {
             margin-top: 10px;
-            padding: 5px;
+            padding: 10px;
             border-radius: 5px;
             border: 1px solid #ddd;
+            font-size: 16px;
+            background-color: #fff;
+        }
+        .planner-header .weekday {
+            margin-top: 5px;
+            font-size: 20px;
+            color: #666;
         }
         .planner-header::after {
             content: '';
@@ -51,11 +59,6 @@
             height: 1px;
             background: linear-gradient(to right, transparent, #333, transparent);
             margin: 10px 0;
-        }
-        .weekday {
-            margin-top: 5px;
-            font-size: 18px;
-            color: #666;
         }
         .section {
             background-color: #fff;
@@ -216,6 +219,7 @@
         
         <div class="section">
             <h2>Deadline Reminders</h2>
+            <button class="add-button" id="addDeadlineButton">Add Deadline</button>
             <div id="schedule">
                 <div class="time-slot">
                     <span class="clock-icon">⏰</span>
@@ -224,7 +228,6 @@
                     <input type="checkbox" class="task-checkbox">
                 </div>
             </div>
-            <button class="add-button" id="addDeadlineButton">Add Deadline</button>
             <div class="section-buttons">
                 <button class="remove-button" onclick="removeSelectedTasks('schedule')">Remove</button>
             </div>
