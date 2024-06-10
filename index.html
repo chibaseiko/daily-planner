@@ -144,9 +144,16 @@
             background-color: #4CAF50;
             color: white;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
         .buttons button.clear {
             background-color: #f44336;
+        }
+        .buttons button:hover {
+            background-color: #45a049;
+        }
+        .buttons button.clear:hover {
+            background-color: #e53935;
         }
         .section-buttons {
             position: absolute;
@@ -158,12 +165,27 @@
         }
         .section-buttons button {
             background-color: #2196F3;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
         .section-buttons .remove-button {
             background-color: #FFC107;
         }
         .section-buttons .move-button {
             background-color: #FF5722;
+        }
+        .section-buttons button:hover {
+            background-color: #1e88e5;
+        }
+        .section-buttons .remove-button:hover {
+            background-color: #ffb300;
+        }
+        .section-buttons .move-button:hover {
+            background-color: #f4511e;
         }
         .clock-icon {
             font-size: 24px;
@@ -186,9 +208,13 @@
                     <span class="clock-icon">⏰</span>
                     <input type="datetime-local">
                     <input type="text" placeholder="Enter task">
+                    <input type="checkbox" class="task-checkbox">
                 </div>
             </div>
             <button class="add-button" onclick="addDeadline()">Add Deadline</button>
+            <div class="section-buttons">
+                <button class="remove-button" onclick="removeSelectedTasks('schedule')">Remove</button>
+            </div>
         </div>
         
         <div class="section">
@@ -265,7 +291,6 @@
             subTaskList.classList.add('sub-task-list');
             newTask.appendChild(subTaskList);
             list.appendChild(newTask);
-            updateTimeSlots();
         }
 
         function addSubTask(button) {
@@ -305,20 +330,23 @@
             const taskInput = document.createElement('input');
             taskInput.type = 'text';
             taskInput.placeholder = 'Enter task';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.classList.add('task-checkbox');
             newDeadline.appendChild(clockIcon);
             newDeadline.appendChild(timeInput);
             newDeadline.appendChild(taskInput);
+            newDeadline.appendChild(checkbox);
             scheduleElement.appendChild(newDeadline);
         }
 
         function removeTask(task) {
             task.remove();
-            updateTimeSlots();
         }
 
         function removeSelectedTasks(listId) {
             const list = document.getElementById(listId);
-            const tasks = list.querySelectorAll('li');
+            const tasks = list.querySelectorAll('li, .time-slot');
             tasks.forEach(task => {
                 const checkbox = task.querySelector('.task-checkbox');
                 if (checkbox && checkbox.checked) {
@@ -336,22 +364,10 @@
                     checkbox.checked = false;
                 }
             });
-            updateTimeSlots();
-        }
-
-        function updateTimeSlots() {
-            const deadlines = document.querySelectorAll('#schedule .time-slot');
-            deadlines.forEach((deadline, index) => {
-                const timeInput = deadline.querySelector('input[type="datetime-local"]');
-                const taskInput = deadline.querySelector('input[type="text"]');
-                timeInput.placeholder = `Deadline ${index + 1}`;
-                taskInput.placeholder = `Task ${index + 1}`;
-            });
         }
 
         function saveNotes() {
             const date = noteDateElement.value || new Date().toISOString().split('T')[0];
-            const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
             localStorage.setItem('currentDate', date);
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
@@ -430,7 +446,6 @@
                 }
                 i++;
             }
-            updateTimeSlots();
         }
 
         function clearNotes() {
