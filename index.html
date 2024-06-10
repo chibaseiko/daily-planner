@@ -9,10 +9,12 @@
             font-family: 'Arial', sans-serif;
             background-color: #f4f4f4;
             margin: 0;
+            padding: 20px 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            box-sizing: border-box;
         }
         .planner-container {
             background-color: #fff;
@@ -68,11 +70,22 @@
             display: flex;
             flex-direction: column;
         }
+        .section:nth-child(1) {
+            background-color: #FFEBEE;
+        }
+        .section:nth-child(2) {
+            background-color: #E3F2FD;
+        }
+        .section:nth-child(3) {
+            background-color: #E8F5E9;
+        }
+        .section:nth-child(4) {
+            background-color: #FFF3E0;
+        }
         .section h2 {
             margin-top: 0;
             font-size: 18px;
             color: #333;
-            background-color: #FFEB3B;
             padding: 10px;
             border-radius: 5px;
             text-align: center;
@@ -86,7 +99,7 @@
             width: 150px;
             color: #555;
         }
-        .time-slot input[type="text"], .sub-task input[type="text"] {
+        .time-slot input[type="text"], .sub-task input[type="text"], .time-slot input[type="datetime-local"] {
             flex: 1;
             padding: 5px;
             border-radius: 5px;
@@ -170,7 +183,7 @@
             <div id="schedule">
                 <div class="time-slot">
                     <span class="clock-icon">⏰</span>
-                    <input type="text" placeholder="Enter deadline">
+                    <input type="datetime-local">
                     <input type="text" placeholder="Enter task">
                 </div>
             </div>
@@ -184,6 +197,7 @@
                     <textarea placeholder="Enter your task"></textarea>
                     <button class="add-button" onclick="addSubTask(this)">Add Subtask</button>
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
+                    <button class="move-button" onclick="moveToTodoList(this)">Move to To-Do List</button>
                     <ul class="sub-task-list"></ul>
                 </li>
             </ul>
@@ -242,11 +256,16 @@
             removeButton.classList.add('remove-button');
             removeButton.innerText = 'Remove';
             removeButton.onclick = function() { removeTask(this); };
+            const moveButton = document.createElement('button');
+            moveButton.classList.add('move-button');
+            moveButton.innerText = 'Move to To-Do List';
+            moveButton.onclick = function() { moveToTodoList(this); };
             const subTaskList = document.createElement('ul');
             subTaskList.classList.add('sub-task-list');
             newTask.appendChild(input);
             newTask.appendChild(addButton);
             newTask.appendChild(removeButton);
+            newTask.appendChild(moveButton);
             newTask.appendChild(subTaskList);
             list.appendChild(newTask);
             updateTimeSlots();
@@ -287,8 +306,7 @@
             clockIcon.classList.add('clock-icon');
             clockIcon.innerHTML = '⏰';
             const timeInput = document.createElement('input');
-            timeInput.type = 'text';
-            timeInput.placeholder = 'Enter deadline';
+            timeInput.type = 'datetime-local';
             const taskInput = document.createElement('input');
             taskInput.type = 'text';
             taskInput.placeholder = 'Enter task';
@@ -314,8 +332,8 @@
         function updateTimeSlots() {
             const deadlines = document.querySelectorAll('#schedule .time-slot');
             deadlines.forEach((deadline, index) => {
-                const timeInput = deadline.querySelector('input[type="text"]:nth-child(2)');
-                const taskInput = deadline.querySelector('input[type="text"]:nth-child(3)');
+                const timeInput = deadline.querySelector('input[type="datetime-local"]');
+                const taskInput = deadline.querySelector('input[type="text"]');
                 timeInput.placeholder = `Deadline ${index + 1}`;
                 taskInput.placeholder = `Task ${index + 1}`;
             });
@@ -327,8 +345,8 @@
             localStorage.setItem('currentDate', date);
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
-                const timeInput = timeSlot.querySelector('input[type="text"]:nth-child(2)');
-                const taskInput = timeSlot.querySelector('input[type="text"]:nth-child(3)');
+                const timeInput = timeSlot.querySelector('input[type="datetime-local"]');
+                const taskInput = timeSlot.querySelector('input[type="text"]');
                 localStorage.setItem(`schedule-${date}-${i}-time`, timeInput.value);
                 localStorage.setItem(`schedule-${date}-${i}-task`, taskInput.value);
             }
@@ -360,8 +378,8 @@
             weekdayElement.innerText = dayOfWeek;
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
-                const timeInput = timeSlot.querySelector('input[type="text"]:nth-child(2)');
-                const taskInput = timeSlot.querySelector('input[type="text"]:nth-child(3)');
+                const timeInput = timeSlot.querySelector('input[type="datetime-local"]');
+                const taskInput = timeSlot.querySelector('input[type="text"]');
                 timeInput.value = localStorage.getItem(`schedule-${date}-${i}-time`) || '';
                 taskInput.value = localStorage.getItem(`schedule-${date}-${i}-task`) || '';
             }
@@ -385,12 +403,17 @@
                 removeButton.classList.add('remove-button');
                 removeButton.innerText = 'Remove';
                 removeButton.onclick = function() { removeTask(this); };
+                const moveButton = document.createElement('button');
+                moveButton.classList.add('move-button');
+                moveButton.innerText = 'Move to To-Do List';
+                moveButton.onclick = function() { moveToTodoList(this); };
                 const subTaskList = document.createElement('ul');
                 subTaskList.classList.add('sub-task-list');
                 input.value = localStorage.getItem(`${listId}-${date}-${i}`);
                 newTask.appendChild(input);
                 newTask.appendChild(addButton);
                 newTask.appendChild(removeButton);
+                newTask.appendChild(moveButton);
                 newTask.appendChild(subTaskList);
                 list.appendChild(newTask);
                 let j = 0;
@@ -417,8 +440,8 @@
                 const date = noteDateElement.value || new Date().toISOString().split('T')[0];
                 for (let i = 0; i < scheduleElement.children.length; i++) {
                     const timeSlot = scheduleElement.children[i];
-                    const timeInput = timeSlot.querySelector('input[type="text"]:nth-child(2)');
-                    const taskInput = timeSlot.querySelector('input[type="text"]:nth-child(3)');
+                    const timeInput = timeSlot.querySelector('input[type="datetime-local"]');
+                    const taskInput = timeSlot.querySelector('input[type="text"]');
                     timeInput.value = '';
                     taskInput.value = '';
                     localStorage.removeItem(`schedule-${date}-${i}-time`);
