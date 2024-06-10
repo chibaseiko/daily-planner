@@ -89,6 +89,19 @@
             text-align: center;
             background-color: #FFEB3B;
         }
+        .add-button {
+            margin: 10px 0;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .add-button:hover {
+            background-color: #45a049;
+        }
         .time-slot, .sub-task {
             display: flex;
             align-items: center;
@@ -219,6 +232,7 @@
         
         <div class="section">
             <h2>Top Priority</h2>
+            <button class="add-button" id="addPriorityTaskButton">Add Task</button>
             <ul class="task-list" id="priorityTasks">
                 <li>
                     <textarea placeholder="Enter your task"></textarea>
@@ -226,7 +240,6 @@
                     <ul class="sub-task-list"></ul>
                 </li>
             </ul>
-            <button class="add-button" id="addPriorityTaskButton">Add Task</button>
             <div class="section-buttons">
                 <button class="remove-button" onclick="removeSelectedTasks('priorityTasks')">Remove</button>
                 <button class="move-button" onclick="moveSelectedTasks()">Move to To-Do List</button>
@@ -235,6 +248,7 @@
         
         <div class="section">
             <h2>To-Do List</h2>
+            <button class="add-button" id="addTodoTaskButton">Add Task</button>
             <ul class="task-list" id="todoTasks">
                 <li>
                     <textarea placeholder="Enter your task"></textarea>
@@ -242,7 +256,6 @@
                     <ul class="sub-task-list"></ul>
                 </li>
             </ul>
-            <button class="add-button" id="addTodoTaskButton">Add Task</button>
             <div class="section-buttons">
                 <button class="remove-button" onclick="removeSelectedTasks('todoTasks')">Remove</button>
             </div>
@@ -250,13 +263,13 @@
         
         <div class="section">
             <h2>Notes/Reminders</h2>
+            <button class="add-button" id="addNoteButton">Add Note</button>
             <ul class="note-list" id="notes">
                 <li>
                     <textarea placeholder="Enter your note"></textarea>
                     <input type="checkbox" class="task-checkbox">
                 </li>
             </ul>
-            <button class="add-button" id="addNoteButton">Add Note</button>
             <div class="section-buttons">
                 <button class="remove-button" onclick="removeSelectedTasks('notes')">Remove</button>
             </div>
