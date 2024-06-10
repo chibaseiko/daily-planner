@@ -5,60 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Daily Planner</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .section { margin-bottom: 20px; padding: 10px; border-radius: 5px; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
         .morning { background-color: #FFEBEE; }
         .forenoon { background-color: #FFF3E0; }
         .afternoon { background-color: #E8F5E9; }
         .evening { background-color: #E3F2FD; }
-        textarea { width: 100%; height: 50px; margin-top: 5px; display: block; }
-        input[type="date"] { margin-top: 10px; }
-        button { margin-top: 10px; }
+        textarea {
+            width: calc(100% - 22px);
+            height: 50px;
+            margin-top: 5px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            display: inline-block;
+        }
+        input[type="date"] {
+            margin-top: 10px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        button.clear {
+            background-color: #f44336;
+        }
+        .add-button {
+            background-color: #2196F3;
+            margin-left: 10px;
+        }
+        .remove-button {
+            background-color: #FFC107;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Daily Planner</h1>
-    <input type="date" id="noteDate">
+    <div class="container">
+        <input type="date" id="noteDate">
+    </div>
     
-    <div class="section morning">
+    <div class="container section morning">
         <h2>Morning</h2>
         <div id="morningNotes"></div>
+        <button class="add-button" onclick="addNoteField('morning')">Add Note</button>
+        <button class="remove-button" onclick="removeNoteField('morning')">Remove Note</button>
     </div>
     
-    <div class="section forenoon">
+    <div class="container section forenoon">
         <h2>Forenoon</h2>
         <div id="forenoonNotes"></div>
+        <button class="add-button" onclick="addNoteField('forenoon')">Add Note</button>
+        <button class="remove-button" onclick="removeNoteField('forenoon')">Remove Note</button>
     </div>
     
-    <div class="section afternoon">
+    <div class="container section afternoon">
         <h2>Afternoon</h2>
         <div id="afternoonNotes"></div>
+        <button class="add-button" onclick="addNoteField('afternoon')">Add Note</button>
+        <button class="remove-button" onclick="removeNoteField('afternoon')">Remove Note</button>
     </div>
     
-    <div class="section evening">
+    <div class="container section evening">
         <h2>Evening</h2>
         <div id="eveningNotes"></div>
+        <button class="add-button" onclick="addNoteField('evening')">Add Note</button>
+        <button class="remove-button" onclick="removeNoteField('evening')">Remove Note</button>
     </div>
     
     <button onclick="saveNotes()">Save</button>
-    <button onclick="clearNotes()">Clear</button>
+    <button class="clear" onclick="clearNotes()">Clear</button>
 
     <script>
         const noteDateElement = document.getElementById('noteDate');
-        const morningNotesElement = document.getElementById('morningNotes');
-        const forenoonNotesElement = document.getElementById('forenoonNotes');
-        const afternoonNotesElement = document.getElementById('afternoonNotes');
-        const eveningNotesElement = document.getElementById('eveningNotes');
+        const sections = ['morning', 'forenoon', 'afternoon', 'evening'];
 
-        function createNoteFields(sectionElement, sectionName) {
-            for (let i = 1; i <= 5; i++) {
+        function createNoteFields(sectionName, count) {
+            const sectionElement = document.getElementById(`${sectionName}Notes`);
+            sectionElement.innerHTML = '';
+            for (let i = 1; i <= count; i++) {
                 const noteDiv = document.createElement('div');
+                noteDiv.style.display = 'flex';
+                noteDiv.style.alignItems = 'center';
+                
                 const textarea = document.createElement('textarea');
                 textarea.id = `${sectionName}Note${i}`;
                 textarea.placeholder = `Write your ${sectionName} note ${i} here...`;
+
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.id = `${sectionName}Checkbox${i}`;
+                checkbox.style.marginLeft = '10px';
+                
                 noteDiv.appendChild(textarea);
                 noteDiv.appendChild(checkbox);
                 sectionElement.appendChild(noteDiv);
@@ -67,8 +143,10 @@
 
         function loadNotes() {
             const date = noteDateElement.value || new Date().toISOString().split('T')[0];
-            ['morning', 'forenoon', 'afternoon', 'evening'].forEach(sectionName => {
-                for (let i = 1; i <= 5; i++) {
+            sections.forEach(sectionName => {
+                const count = localStorage.getItem(`${sectionName}Count-${date}`) || 5;
+                createNoteFields(sectionName, count);
+                for (let i = 1; i <= count; i++) {
                     document.getElementById(`${sectionName}Note${i}`).value = localStorage.getItem(`${sectionName}Note${i}-${date}`) || '';
                     document.getElementById(`${sectionName}Checkbox${i}`).checked = localStorage.getItem(`${sectionName}Checkbox${i}-${date}`) === 'true';
                 }
@@ -77,8 +155,11 @@
 
         function saveNotes() {
             const date = noteDateElement.value || new Date().toISOString().split('T')[0];
-            ['morning', 'forenoon', 'afternoon', 'evening'].forEach(sectionName => {
-                for (let i = 1; i <= 5; i++) {
+            sections.forEach(sectionName => {
+                const sectionElement = document.getElementById(`${sectionName}Notes`);
+                const count = sectionElement.children.length;
+                localStorage.setItem(`${sectionName}Count-${date}`, count);
+                for (let i = 1; i <= count; i++) {
                     localStorage.setItem(`${sectionName}Note${i}-${date}`, document.getElementById(`${sectionName}Note${i}`).value);
                     localStorage.setItem(`${sectionName}Checkbox${i}-${date}`, document.getElementById(`${sectionName}Checkbox${i}`).checked);
                 }
@@ -89,23 +170,35 @@
         function clearNotes() {
             if (confirm('Are you sure you want to clear the notes?')) {
                 const date = noteDateElement.value || new Date().toISOString().split('T')[0];
-                ['morning', 'forenoon', 'afternoon', 'evening'].forEach(sectionName => {
-                    for (let i = 1; i <= 5; i++) {
+                sections.forEach(sectionName => {
+                    const count = localStorage.getItem(`${sectionName}Count-${date}`) || 5;
+                    for (let i = 1; i <= count; i++) {
                         document.getElementById(`${sectionName}Note${i}`).value = '';
                         document.getElementById(`${sectionName}Checkbox${i}`).checked = false;
                         localStorage.removeItem(`${sectionName}Note${i}-${date}`);
                         localStorage.removeItem(`${sectionName}Checkbox${i}-${date}`);
                     }
+                    localStorage.removeItem(`${sectionName}Count-${date}`);
                 });
+            }
+        }
+
+        function addNoteField(sectionName) {
+            const sectionElement = document.getElementById(`${sectionName}Notes`);
+            const count = sectionElement.children.length + 1;
+            createNoteFields(sectionName, count);
+        }
+
+        function removeNoteField(sectionName) {
+            const sectionElement = document.getElementById(`${sectionName}Notes`);
+            if (sectionElement.children.length > 0) {
+                sectionElement.removeChild(sectionElement.lastChild);
             }
         }
 
         noteDateElement.addEventListener('change', loadNotes);
         document.addEventListener('DOMContentLoaded', () => {
-            createNoteFields(morningNotesElement, 'morning');
-            createNoteFields(forenoonNotesElement, 'forenoon');
-            createNoteFields(afternoonNotesElement, 'afternoon');
-            createNoteFields(eveningNotesElement, 'evening');
+            sections.forEach(sectionName => createNoteFields(sectionName, 5));
             loadNotes();
         });
     </script>
