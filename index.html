@@ -101,15 +101,6 @@
             border: 1px solid #ddd;
             margin-left: 10px;
         }
-        .task-list li input[type="checkbox"], .note-list li input[type="checkbox"] {
-            margin-left: 10px;
-        }
-        .task-list li input[type="color"] {
-            margin-left: 10px;
-            border: none;
-            width: 30px;
-            height: 30px;
-        }
         .buttons {
             text-align: center;
             grid-column: span 2;
@@ -162,8 +153,6 @@
             <ul class="task-list" id="priorityTasks">
                 <li>
                     <input type="text" placeholder="Enter your task">
-                    <input type="checkbox">
-                    <input type="color">
                     <button class="add-button" onclick="addSubTask(this)">Add Subtask</button>
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
                     <button class="move-button" onclick="moveToTodoList(this)">Move to To-Do List</button>
@@ -178,8 +167,6 @@
             <ul class="task-list" id="todoTasks">
                 <li>
                     <input type="text" placeholder="Enter your task">
-                    <input type="checkbox">
-                    <input type="color">
                     <button class="add-button" onclick="addSubTask(this)">Add Subtask</button>
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
                     <ul class="sub-task-list"></ul>
@@ -221,10 +208,6 @@
             const input = document.createElement('input');
             input.type = 'text';
             input.placeholder = 'Enter your task';
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            const colorPicker = document.createElement('input');
-            colorPicker.type = 'color';
             const addButton = document.createElement('button');
             addButton.classList.add('add-button');
             addButton.innerText = 'Add Subtask';
@@ -240,8 +223,6 @@
             const subTaskList = document.createElement('ul');
             subTaskList.classList.add('sub-task-list');
             newTask.appendChild(input);
-            newTask.appendChild(checkbox);
-            newTask.appendChild(colorPicker);
             newTask.appendChild(addButton);
             newTask.appendChild(removeButton);
             newTask.appendChild(moveButton);
@@ -257,7 +238,12 @@
             const input = document.createElement('input');
             input.type = 'text';
             input.placeholder = 'Enter your subtask';
+            const removeSubButton = document.createElement('button');
+            removeSubButton.classList.add('remove-button');
+            removeSubButton.innerText = 'Remove';
+            removeSubButton.onclick = function() { removeTask(this); };
             newSubTask.appendChild(input);
+            newSubTask.appendChild(removeSubButton);
             subTaskList.appendChild(newSubTask);
             updateTimeSlots();
         }
@@ -334,15 +320,7 @@
             for (let i = 0; i < list.children.length; i++) {
                 const item = list.children[i];
                 const input = item.querySelector('input[type="text"]');
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                const colorPicker = item.querySelector('input[type="color"]');
                 localStorage.setItem(`${listId}-${date}-${i}`, input.value);
-                if (checkbox) {
-                    localStorage.setItem(`${listId}-checkbox-${date}-${i}`, checkbox.checked);
-                }
-                if (colorPicker) {
-                    localStorage.setItem(`${listId}-color-${date}-${i}`, colorPicker.value);
-                }
                 const subTaskList = item.querySelector('.sub-task-list');
                 for (let j = 0; j < subTaskList.children.length; j++) {
                     const subTask = subTaskList.children[j];
@@ -382,10 +360,6 @@
                 const newTask = document.createElement('li');
                 const input = document.createElement('input');
                 input.type = 'text';
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                const colorPicker = document.createElement('input');
-                colorPicker.type = 'color';
                 const addButton = document.createElement('button');
                 addButton.classList.add('add-button');
                 addButton.innerText = 'Add Subtask';
@@ -401,11 +375,7 @@
                 const subTaskList = document.createElement('ul');
                 subTaskList.classList.add('sub-task-list');
                 input.value = localStorage.getItem(`${listId}-${date}-${i}`);
-                checkbox.checked = localStorage.getItem(`${listId}-checkbox-${date}-${i}`) === 'true';
-                colorPicker.value = localStorage.getItem(`${listId}-color-${date}-${i}`) || '#ffffff';
                 newTask.appendChild(input);
-                newTask.appendChild(checkbox);
-                newTask.appendChild(colorPicker);
                 newTask.appendChild(addButton);
                 newTask.appendChild(removeButton);
                 newTask.appendChild(moveButton);
@@ -416,8 +386,13 @@
                     const newSubTask = document.createElement('li');
                     const subTaskInput = document.createElement('input');
                     subTaskInput.type = 'text';
+                    const removeSubButton = document.createElement('button');
+                    removeSubButton.classList.add('remove-button');
+                    removeSubButton.innerText = 'Remove';
+                    removeSubButton.onclick = function() { removeTask(this); };
                     subTaskInput.value = localStorage.getItem(`${listId}-${date}-${i}-subtask-${j}`);
                     newSubTask.appendChild(subTaskInput);
+                    newSubTask.appendChild(removeSubButton);
                     subTaskList.appendChild(newSubTask);
                     j++;
                 }
@@ -449,17 +424,7 @@
             for (let i = 0; i < list.children.length; i++) {
                 const item = list.children[i];
                 const input = item.querySelector('input[type="text"]');
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                const colorPicker = item.querySelector('input[type="color"]');
                 input.value = '';
-                if (checkbox) {
-                    checkbox.checked = false;
-                    localStorage.removeItem(`${listId}-checkbox-${date}-${i}`);
-                }
-                if (colorPicker) {
-                    colorPicker.value = '#ffffff';
-                    localStorage.removeItem(`${listId}-color-${date}-${i}`);
-                }
                 const subTaskList = item.querySelector('.sub-task-list');
                 for (let j = 0; j < subTaskList.children.length; j++) {
                     const subTask = subTaskList.children[j];
