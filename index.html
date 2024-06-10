@@ -33,32 +33,30 @@
             text-align: center;
             margin-bottom: 20px;
             padding-top: 20px;
+            background-color: #333;
+            color: #fff;
+            border-radius: 10px;
+            padding: 10px;
         }
         .planner-header h1 {
             font-size: 32px;
-            color: #333;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
         }
         .planner-header input[type="date"] {
             margin-top: 10px;
             padding: 10px;
             border-radius: 5px;
-            border: 1px solid #ddd;
+            border: none;
             font-size: 16px;
             background-color: #fff;
+            color: #333;
         }
         .planner-header .weekday {
             margin-top: 5px;
             font-size: 20px;
-            color: #666;
-        }
-        .planner-header::after {
-            content: '';
-            display: block;
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #333, transparent);
-            margin: 10px 0;
+            color: #ccc;
         }
         .section {
             background-color: #fff;
@@ -121,6 +119,9 @@
             border-radius: 5px;
             border: 1px solid #ddd;
             margin-left: 10px;
+        }
+        .time-slot input[type="text"], .sub-task input[type="text"] {
+            resize: vertical; /* 允许垂直调整大小 */
         }
         .task-list, .note-list {
             padding: 0;
@@ -306,8 +307,7 @@
             clockIcon.innerHTML = '⏰';
             const timeInput = document.createElement('input');
             timeInput.type = 'datetime-local';
-            const taskInput = document.createElement('input');
-            taskInput.type = 'text';
+            const taskInput = document.createElement('textarea');
             taskInput.placeholder = 'Enter your task';
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
@@ -351,7 +351,7 @@
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
                 const timeInput = timeSlot.querySelector('input[type="datetime-local"]');
-                const taskInput = timeSlot.querySelector('input[type="text"]');
+                const taskInput = timeSlot.querySelector('textarea');
                 localStorage.setItem(`schedule-${date}-${i}-time`, timeInput.value);
                 localStorage.setItem(`schedule-${date}-${i}-task`, taskInput.value);
             }
@@ -384,7 +384,7 @@
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
                 const timeInput = timeSlot.querySelector('input[type="datetime-local"]');
-                const taskInput = timeSlot.querySelector('input[type="text"]');
+                const taskInput = timeSlot.querySelector('textarea');
                 timeInput.value = localStorage.getItem(`schedule-${date}-${i}-time`) || '';
                 taskInput.value = localStorage.getItem(`schedule-${date}-${i}-task`) || '';
             }
@@ -433,7 +433,7 @@
                 for (let i = 0; i < scheduleElement.children.length; i++) {
                     const timeSlot = scheduleElement.children[i];
                     const timeInput = timeSlot.querySelector('input[type="datetime-local"]');
-                    const taskInput = timeSlot.querySelector('input[type="text"]');
+                    const taskInput = timeSlot.querySelector('textarea');
                     timeInput.value = '';
                     taskInput.value = '';
                     localStorage.removeItem(`schedule-${date}-${i}-time`);
