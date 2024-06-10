@@ -66,6 +66,7 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            position: relative;
         }
         .section:nth-child(2) {
             background-color: #FFEBEE;
@@ -127,6 +128,9 @@
             margin-left: 10px;
             resize: vertical;
         }
+        .task-list li input[type="checkbox"], .note-list li input[type="checkbox"] {
+            margin-left: 10px;
+        }
         .buttons {
             text-align: center;
             grid-column: span 2;
@@ -144,17 +148,22 @@
         .buttons button.clear {
             background-color: #f44336;
         }
-        .add-button {
+        .section-buttons {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .section-buttons button {
             background-color: #2196F3;
-            margin-left: 10px;
         }
-        .remove-button {
+        .section-buttons .remove-button {
             background-color: #FFC107;
-            margin-left: 10px;
         }
-        .move-button {
+        .section-buttons .move-button {
             background-color: #FF5722;
-            margin-left: 10px;
         }
         .clock-icon {
             font-size: 24px;
@@ -187,13 +196,15 @@
             <ul class="task-list" id="priorityTasks">
                 <li>
                     <textarea placeholder="Enter your task"></textarea>
-                    <button class="add-button" onclick="addSubTask(this)">Add Subtask</button>
-                    <button class="remove-button" onclick="removeTask(this)">Remove</button>
-                    <button class="move-button" onclick="moveToTodoList(this)">Move to To-Do List</button>
+                    <input type="checkbox" class="task-checkbox">
                     <ul class="sub-task-list"></ul>
                 </li>
             </ul>
             <button onclick="addTask('priorityTasks')">Add Task</button>
+            <div class="section-buttons">
+                <button class="remove-button" onclick="removeSelectedTasks('priorityTasks')">Remove</button>
+                <button class="move-button" onclick="moveSelectedTasks()">Move to To-Do List</button>
+            </div>
         </div>
         
         <div class="section">
@@ -201,12 +212,14 @@
             <ul class="task-list" id="todoTasks">
                 <li>
                     <textarea placeholder="Enter your task"></textarea>
-                    <button class="add-button" onclick="addSubTask(this)">Add Subtask</button>
-                    <button class="remove-button" onclick="removeTask(this)">Remove</button>
+                    <input type="checkbox" class="task-checkbox">
                     <ul class="sub-task-list"></ul>
                 </li>
             </ul>
             <button onclick="addTask('todoTasks')">Add Task</button>
+            <div class="section-buttons">
+                <button class="remove-button" onclick="removeSelectedTasks('todoTasks')">Remove</button>
+            </div>
         </div>
         
         <div class="section">
@@ -214,10 +227,13 @@
             <ul class="note-list" id="notes">
                 <li>
                     <textarea placeholder="Enter your note"></textarea>
-                    <button class="remove-button" onclick="removeTask(this)">Remove</button>
+                    <input type="checkbox" class="task-checkbox">
                 </li>
             </ul>
             <button onclick="addNote()">Add Note</button>
+            <div class="section-buttons">
+                <button class="remove-button" onclick="removeSelectedTasks('notes')">Remove</button>
+            </div>
         </div>
         
         <div class="buttons">
@@ -240,24 +256,11 @@
             const newTask = document.createElement('li');
             const input = document.createElement('textarea');
             input.placeholder = 'Enter your task';
-            const addButton = document.createElement('button');
-            addButton.classList.add('add-button');
-            addButton.innerText = 'Add Subtask';
-            addButton.onclick = function() { addSubTask(this); };
-            const removeButton = document.createElement('button');
-            removeButton.classList.add('remove-button');
-            removeButton.innerText = 'Remove';
-            removeButton.onclick = function() { removeTask(this); };
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.classList.add('task-checkbox');
             newTask.appendChild(input);
-            newTask.appendChild(addButton);
-            newTask.appendChild(removeButton);
-            if (listId === 'priorityTasks') {
-                const moveButton = document.createElement('button');
-                moveButton.classList.add('move-button');
-                moveButton.innerText = 'Move to To-Do List';
-                moveButton.onclick = function() { moveToTodoList(this); };
-                newTask.appendChild(moveButton);
-            }
+            newTask.appendChild(checkbox);
             const subTaskList = document.createElement('ul');
             subTaskList.classList.add('sub-task-list');
             newTask.appendChild(subTaskList);
@@ -271,12 +274,11 @@
             const newSubTask = document.createElement('li');
             const input = document.createElement('textarea');
             input.placeholder = 'Enter your subtask';
-            const removeSubButton = document.createElement('button');
-            removeSubButton.classList.add('remove-button');
-            removeSubButton.innerText = 'Remove';
-            removeSubButton.onclick = function() { removeTask(this); };
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.classList.add('task-checkbox');
             newSubTask.appendChild(input);
-            newSubTask.appendChild(removeSubButton);
+            newSubTask.appendChild(checkbox);
             subTaskList.appendChild(newSubTask);
         }
 
@@ -284,12 +286,11 @@
             const newNote = document.createElement('li');
             const input = document.createElement('textarea');
             input.placeholder = 'Enter your note';
-            const removeButton = document.createElement('button');
-            removeButton.classList.add('remove-button');
-            removeButton.innerText = 'Remove';
-            removeButton.onclick = function() { removeTask(this); };
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.classList.add('task-checkbox');
             newNote.appendChild(input);
-            newNote.appendChild(removeButton);
+            newNote.appendChild(checkbox);
             notesElement.appendChild(newNote);
         }
 
@@ -310,16 +311,31 @@
             scheduleElement.appendChild(newDeadline);
         }
 
-        function removeTask(button) {
-            const task = button.parentElement;
+        function removeTask(task) {
             task.remove();
             updateTimeSlots();
         }
 
-        function moveToTodoList(button) {
-            const task = button.parentElement;
-            todoTasksElement.appendChild(task);
-            button.remove();
+        function removeSelectedTasks(listId) {
+            const list = document.getElementById(listId);
+            const tasks = list.querySelectorAll('li');
+            tasks.forEach(task => {
+                const checkbox = task.querySelector('.task-checkbox');
+                if (checkbox && checkbox.checked) {
+                    removeTask(task);
+                }
+            });
+        }
+
+        function moveSelectedTasks() {
+            const tasks = priorityTasksElement.querySelectorAll('li');
+            tasks.forEach(task => {
+                const checkbox = task.querySelector('.task-checkbox');
+                if (checkbox && checkbox.checked) {
+                    todoTasksElement.appendChild(task);
+                    checkbox.checked = false;
+                }
+            });
             updateTimeSlots();
         }
 
@@ -389,40 +405,26 @@
             while (localStorage.getItem(`${listId}-${date}-${i}`) !== null) {
                 const newTask = document.createElement('li');
                 const input = document.createElement('textarea');
-                const addButton = document.createElement('button');
-                addButton.classList.add('add-button');
-                addButton.innerText = 'Add Subtask';
-                addButton.onclick = function() { addSubTask(this); };
-                const removeButton = document.createElement('button');
-                removeButton.classList.add('remove-button');
-                removeButton.innerText = 'Remove';
-                removeButton.onclick = function() { removeTask(this); };
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.classList.add('task-checkbox');
                 const subTaskList = document.createElement('ul');
                 subTaskList.classList.add('sub-task-list');
                 input.value = localStorage.getItem(`${listId}-${date}-${i}`);
                 newTask.appendChild(input);
-                newTask.appendChild(addButton);
-                newTask.appendChild(removeButton);
-                if (listId === 'priorityTasks') {
-                    const moveButton = document.createElement('button');
-                    moveButton.classList.add('move-button');
-                    moveButton.innerText = 'Move to To-Do List';
-                    moveButton.onclick = function() { moveToTodoList(this); };
-                    newTask.appendChild(moveButton);
-                }
+                newTask.appendChild(checkbox);
                 newTask.appendChild(subTaskList);
                 list.appendChild(newTask);
                 let j = 0;
                 while (localStorage.getItem(`${listId}-${date}-${i}-subtask-${j}`) !== null) {
                     const newSubTask = document.createElement('li');
                     const subTaskInput = document.createElement('textarea');
-                    const removeSubButton = document.createElement('button');
-                    removeSubButton.classList.add('remove-button');
-                    removeSubButton.innerText = 'Remove';
-                    removeSubButton.onclick = function() { removeTask(this); };
+                    const subCheckbox = document.createElement('input');
+                    subCheckbox.type = 'checkbox';
+                    subCheckbox.classList.add('task-checkbox');
                     subTaskInput.value = localStorage.getItem(`${listId}-${date}-${i}-subtask-${j}`);
                     newSubTask.appendChild(subTaskInput);
-                    newSubTask.appendChild(removeSubButton);
+                    newSubTask.appendChild(subCheckbox);
                     subTaskList.appendChild(newSubTask);
                     j++;
                 }
