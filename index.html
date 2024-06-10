@@ -3,56 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Daily Planner</title>
+    <title>Daily Schedule Planner</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             background-color: #f4f4f4;
-            margin: 20px;
+            margin: 0;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
+            height: 100vh;
         }
-        h1 {
-            color: #333;
-        }
-        .container {
+        .planner-container {
             background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             padding: 20px;
             width: 90%;
-            max-width: 800px;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        .planner-header {
+            grid-column: span 2;
+            text-align: center;
             margin-bottom: 20px;
         }
-        .section {
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 5px;
+        .planner-header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
         }
-        .morning { background-color: #FFEBEE; }
-        .forenoon { background-color: #FFF3E0; }
-        .afternoon { background-color: #E8F5E9; }
-        .evening { background-color: #E3F2FD; }
-        textarea {
-            width: calc(100% - 22px);
-            height: 50px;
-            margin-top: 5px;
-            margin-right: 5px;
-            margin-bottom: 5px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            display: inline-block;
-        }
-        input[type="date"] {
+        .planner-header input[type="date"] {
             margin-top: 10px;
             padding: 5px;
             border-radius: 5px;
             border: 1px solid #ddd;
         }
-        button {
-            margin-top: 10px;
+        .section {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .section h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #333;
+            background-color: #FFEB3B;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .time-slot {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .time-slot span {
+            width: 60px;
+            color: #555;
+        }
+        .time-slot textarea {
+            flex: 1;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-left: 10px;
+            resize: none;
+        }
+        .task-list, .note-list {
+            padding: 0;
+            list-style: none;
+        }
+        .task-list li, .note-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .task-list li textarea, .note-list li textarea {
+            flex: 1;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            resize: none;
+        }
+        .task-list li input[type="checkbox"], .note-list li input[type="checkbox"] {
+            margin-left: 10px;
+        }
+        .buttons {
+            text-align: center;
+            grid-column: span 2;
+            margin-top: 20px;
+        }
+        .buttons button {
+            margin: 5px;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
@@ -60,147 +105,178 @@
             color: white;
             cursor: pointer;
         }
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        button.clear {
+        .buttons button.clear {
             background-color: #f44336;
-        }
-        .add-button {
-            background-color: #2196F3;
-            margin-left: 10px;
-        }
-        .remove-button {
-            background-color: #FFC107;
-            margin-left: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Daily Planner</h1>
-    <div class="container">
-        <input type="date" id="noteDate">
+    <div class="planner-container">
+        <div class="planner-header">
+            <h1>Daily Schedule Planner</h1>
+            <input type="date" id="noteDate">
+        </div>
+        
+        <div class="section">
+            <h2>Today's Schedule</h2>
+            <div id="schedule">
+                <div class="time-slot">
+                    <span>8:00am</span>
+                    <textarea id="schedule-8am"></textarea>
+                </div>
+                <!-- Repeat for other time slots -->
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Top Priority</h2>
+            <ul class="task-list" id="priorityTasks">
+                <li>
+                    <textarea></textarea>
+                    <input type="checkbox">
+                </li>
+                <!-- Repeat for other tasks -->
+            </ul>
+            <button onclick="addTask('priorityTasks')">Add Task</button>
+        </div>
+        
+        <div class="section">
+            <h2>To-Do List</h2>
+            <ul class="task-list" id="todoTasks">
+                <li>
+                    <textarea></textarea>
+                    <input type="checkbox">
+                </li>
+                <!-- Repeat for other tasks -->
+            </ul>
+            <button onclick="addTask('todoTasks')">Add Task</button>
+        </div>
+        
+        <div class="section">
+            <h2>Notes/Reminders</h2>
+            <ul class="note-list" id="notes">
+                <li>
+                    <textarea></textarea>
+                </li>
+                <!-- Repeat for other notes -->
+            </ul>
+            <button onclick="addNote()">Add Note</button>
+        </div>
+        
+        <div class="buttons">
+            <button onclick="saveNotes()">Save</button>
+            <button class="clear" onclick="clearNotes()">Clear</button>
+        </div>
     </div>
-    
-    <div class="container section morning">
-        <h2>Morning</h2>
-        <div id="morningNotes"></div>
-        <button class="add-button" onclick="addNoteField('morning')">Add Note</button>
-        <button class="remove-button" onclick="removeNoteField('morning')">Remove Note</button>
-    </div>
-    
-    <div class="container section forenoon">
-        <h2>Forenoon</h2>
-        <div id="forenoonNotes"></div>
-        <button class="add-button" onclick="addNoteField('forenoon')">Add Note</button>
-        <button class="remove-button" onclick="removeNoteField('forenoon')">Remove Note</button>
-    </div>
-    
-    <div class="container section afternoon">
-        <h2>Afternoon</h2>
-        <div id="afternoonNotes"></div>
-        <button class="add-button" onclick="addNoteField('afternoon')">Add Note</button>
-        <button class="remove-button" onclick="removeNoteField('afternoon')">Remove Note</button>
-    </div>
-    
-    <div class="container section evening">
-        <h2>Evening</h2>
-        <div id="eveningNotes"></div>
-        <button class="add-button" onclick="addNoteField('evening')">Add Note</button>
-        <button class="remove-button" onclick="removeNoteField('evening')">Remove Note</button>
-    </div>
-    
-    <button onclick="saveNotes()">Save</button>
-    <button class="clear" onclick="clearNotes()">Clear</button>
 
     <script>
         const noteDateElement = document.getElementById('noteDate');
-        const sections = ['morning', 'forenoon', 'afternoon', 'evening'];
+        const scheduleElement = document.getElementById('schedule');
+        const priorityTasksElement = document.getElementById('priorityTasks');
+        const todoTasksElement = document.getElementById('todoTasks');
+        const notesElement = document.getElementById('notes');
 
-        function createNoteFields(sectionName, count) {
-            const sectionElement = document.getElementById(`${sectionName}Notes`);
-            sectionElement.innerHTML = '';
-            for (let i = 1; i <= count; i++) {
-                const noteDiv = document.createElement('div');
-                noteDiv.style.display = 'flex';
-                noteDiv.style.alignItems = 'center';
-                
-                const textarea = document.createElement('textarea');
-                textarea.id = `${sectionName}Note${i}`;
-                textarea.placeholder = `Write your ${sectionName} note ${i} here...`;
+        function addTask(listId) {
+            const list = document.getElementById(listId);
+            const newTask = document.createElement('li');
+            const textarea = document.createElement('textarea');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            newTask.appendChild(textarea);
+            newTask.appendChild(checkbox);
+            list.appendChild(newTask);
+        }
 
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `${sectionName}Checkbox${i}`;
-                checkbox.style.marginLeft = '10px';
-                
-                noteDiv.appendChild(textarea);
-                noteDiv.appendChild(checkbox);
-                sectionElement.appendChild(noteDiv);
+        function addNote() {
+            const newNote = document.createElement('li');
+            const textarea = document.createElement('textarea');
+            newNote.appendChild(textarea);
+            notesElement.appendChild(newNote);
+        }
+
+        function saveNotes() {
+            const date = noteDateElement.value || new Date().toISOString().split('T')[0];
+            for (let i = 0; i < scheduleElement.children.length; i++) {
+                const timeSlot = scheduleElement.children[i];
+                const textarea = timeSlot.querySelector('textarea');
+                localStorage.setItem(`schedule-${date}-${i}`, textarea.value);
+            }
+            saveList('priorityTasks', date);
+            saveList('todoTasks', date);
+            saveList('notes', date);
+            alert('Notes saved!');
+        }
+
+        function saveList(listId, date) {
+            const list = document.getElementById(listId);
+            for (let i = 0; i < list.children.length; i++) {
+                const item = list.children[i];
+                const textarea = item.querySelector('textarea');
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                localStorage.setItem(`${listId}-${date}-${i}`, textarea.value);
+                if (checkbox) {
+                    localStorage.setItem(`${listId}-checkbox-${date}-${i}`, checkbox.checked);
+                }
             }
         }
 
         function loadNotes() {
             const date = noteDateElement.value || new Date().toISOString().split('T')[0];
-            sections.forEach(sectionName => {
-                const count = localStorage.getItem(`${sectionName}Count-${date}`) || 5;
-                createNoteFields(sectionName, count);
-                for (let i = 1; i <= count; i++) {
-                    document.getElementById(`${sectionName}Note${i}`).value = localStorage.getItem(`${sectionName}Note${i}-${date}`) || '';
-                    document.getElementById(`${sectionName}Checkbox${i}`).checked = localStorage.getItem(`${sectionName}Checkbox${i}-${date}`) === 'true';
-                }
-            });
+            for (let i = 0; i < scheduleElement.children.length; i++) {
+                const timeSlot = scheduleElement.children[i];
+                const textarea = timeSlot.querySelector('textarea');
+                textarea.value = localStorage.getItem(`schedule-${date}-${i}`) || '';
+            }
+            loadList('priorityTasks', date);
+            loadList('todoTasks', date);
+            loadList('notes', date);
         }
 
-        function saveNotes() {
-            const date = noteDateElement.value || new Date().toISOString().split('T')[0];
-            sections.forEach(sectionName => {
-                const sectionElement = document.getElementById(`${sectionName}Notes`);
-                const count = sectionElement.children.length;
-                localStorage.setItem(`${sectionName}Count-${date}`, count);
-                for (let i = 1; i <= count; i++) {
-                    localStorage.setItem(`${sectionName}Note${i}-${date}`, document.getElementById(`${sectionName}Note${i}`).value);
-                    localStorage.setItem(`${sectionName}Checkbox${i}-${date}`, document.getElementById(`${sectionName}Checkbox${i}`).checked);
+        function loadList(listId, date) {
+            const list = document.getElementById(listId);
+            for (let i = 0; i < list.children.length; i++) {
+                const item = list.children[i];
+                const textarea = item.querySelector('textarea');
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                textarea.value = localStorage.getItem(`${listId}-${date}-${i}`) || '';
+                if (checkbox) {
+                    checkbox.checked = localStorage.getItem(`${listId}-checkbox-${date}-${i}`) === 'true';
                 }
-            });
-            alert('Notes saved!');
+            }
         }
 
         function clearNotes() {
             if (confirm('Are you sure you want to clear the notes?')) {
                 const date = noteDateElement.value || new Date().toISOString().split('T')[0];
-                sections.forEach(sectionName => {
-                    const count = localStorage.getItem(`${sectionName}Count-${date}`) || 5;
-                    for (let i = 1; i <= count; i++) {
-                        document.getElementById(`${sectionName}Note${i}`).value = '';
-                        document.getElementById(`${sectionName}Checkbox${i}`).checked = false;
-                        localStorage.removeItem(`${sectionName}Note${i}-${date}`);
-                        localStorage.removeItem(`${sectionName}Checkbox${i}-${date}`);
-                    }
-                    localStorage.removeItem(`${sectionName}Count-${date}`);
-                });
+                for (let i = 0; i < scheduleElement.children.length; i++) {
+                    const timeSlot = scheduleElement.children[i];
+                    const textarea = timeSlot.querySelector('textarea');
+                    textarea.value = '';
+                    localStorage.removeItem(`schedule-${date}-${i}`);
+                }
+                clearList('priorityTasks', date);
+                clearList('todoTasks', date);
+                clearList('notes', date);
             }
         }
 
-        function addNoteField(sectionName) {
-            const sectionElement = document.getElementById(`${sectionName}Notes`);
-            const count = sectionElement.children.length + 1;
-            createNoteFields(sectionName, count);
-        }
-
-        function removeNoteField(sectionName) {
-            const sectionElement = document.getElementById(`${sectionName}Notes`);
-            if (sectionElement.children.length > 0) {
-                sectionElement.removeChild(sectionElement.lastChild);
+        function clearList(listId, date) {
+            const list = document.getElementById(listId);
+            for (let i = 0; i < list.children.length; i++) {
+                const item = list.children[i];
+                const textarea = item.querySelector('textarea');
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                textarea.value = '';
+                if (checkbox) {
+                    checkbox.checked = false;
+                    localStorage.removeItem(`${listId}-checkbox-${date}-${i}`);
+                }
+                localStorage.removeItem(`${listId}-${date}-${i}`);
             }
         }
 
         noteDateElement.addEventListener('change', loadNotes);
-        document.addEventListener('DOMContentLoaded', () => {
-            sections.forEach(sectionName => createNoteFields(sectionName, 5));
-            loadNotes();
-        });
+        document.addEventListener('DOMContentLoaded', loadNotes);
     </script>
 </body>
 </html>
