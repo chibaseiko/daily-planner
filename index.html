@@ -211,7 +211,7 @@
                     <input type="checkbox" class="task-checkbox">
                 </div>
             </div>
-            <button class="add-button" onclick="addDeadline()">Add Deadline</button>
+            <button class="add-button" id="addDeadlineButton">Add Deadline</button>
             <div class="section-buttons">
                 <button class="remove-button" onclick="removeSelectedTasks('schedule')">Remove</button>
             </div>
@@ -226,7 +226,7 @@
                     <ul class="sub-task-list"></ul>
                 </li>
             </ul>
-            <button class="add-button" onclick="addTask('priorityTasks')">Add Task</button>
+            <button class="add-button" id="addPriorityTaskButton">Add Task</button>
             <div class="section-buttons">
                 <button class="remove-button" onclick="removeSelectedTasks('priorityTasks')">Remove</button>
                 <button class="move-button" onclick="moveSelectedTasks()">Move to To-Do List</button>
@@ -242,7 +242,7 @@
                     <ul class="sub-task-list"></ul>
                 </li>
             </ul>
-            <button class="add-button" onclick="addTask('todoTasks')">Add Task</button>
+            <button class="add-button" id="addTodoTaskButton">Add Task</button>
             <div class="section-buttons">
                 <button class="remove-button" onclick="removeSelectedTasks('todoTasks')">Remove</button>
             </div>
@@ -256,7 +256,7 @@
                     <input type="checkbox" class="task-checkbox">
                 </li>
             </ul>
-            <button class="add-button" onclick="addNote()">Add Note</button>
+            <button class="add-button" id="addNoteButton">Add Note</button>
             <div class="section-buttons">
                 <button class="remove-button" onclick="removeSelectedTasks('notes')">Remove</button>
             </div>
@@ -269,13 +269,17 @@
     </div>
 
     <script>
-        const plannerTitleElement = document.getElementById('plannerTitle');
         const noteDateElement = document.getElementById('noteDate');
         const weekdayElement = document.getElementById('weekday');
         const scheduleElement = document.getElementById('schedule');
         const priorityTasksElement = document.getElementById('priorityTasks');
         const todoTasksElement = document.getElementById('todoTasks');
         const notesElement = document.getElementById('notes');
+
+        document.getElementById('addDeadlineButton').addEventListener('click', addDeadline);
+        document.getElementById('addPriorityTaskButton').addEventListener('click', () => addTask('priorityTasks'));
+        document.getElementById('addTodoTaskButton').addEventListener('click', () => addTask('todoTasks'));
+        document.getElementById('addNoteButton').addEventListener('click', addNote);
 
         function addTask(listId) {
             const list = document.getElementById(listId);
@@ -291,20 +295,6 @@
             subTaskList.classList.add('sub-task-list');
             newTask.appendChild(subTaskList);
             list.appendChild(newTask);
-        }
-
-        function addSubTask(button) {
-            const task = button.parentElement;
-            const subTaskList = task.querySelector('.sub-task-list');
-            const newSubTask = document.createElement('li');
-            const input = document.createElement('textarea');
-            input.placeholder = 'Enter your subtask';
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.classList.add('task-checkbox');
-            newSubTask.appendChild(input);
-            newSubTask.appendChild(checkbox);
-            subTaskList.appendChild(newSubTask);
         }
 
         function addNote() {
