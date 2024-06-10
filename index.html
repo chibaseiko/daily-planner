@@ -143,12 +143,7 @@
         <div class="section">
             <h2>Today's Schedule</h2>
             <div id="schedule">
-                <!-- Time slots from 8:00 AM to 6:00 PM -->
-                <div class="time-slot">
-                    <input type="text" id="time-8am" placeholder="8:00am - 9:00am">
-                    <input type="text" id="schedule-8am" placeholder="Enter your schedule">
-                </div>
-                <!-- Repeat for other time slots -->
+                <!-- Initial time slot, will be populated dynamically -->
             </div>
         </div>
         
@@ -162,7 +157,6 @@
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
                     <ul class="sub-task-list"></ul>
                 </li>
-                <!-- Repeat for other tasks -->
             </ul>
             <button onclick="addTask('priorityTasks')">Add Task</button>
         </div>
@@ -177,7 +171,6 @@
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
                     <ul class="sub-task-list"></ul>
                 </li>
-                <!-- Repeat for other tasks -->
             </ul>
             <button onclick="addTask('todoTasks')">Add Task</button>
         </div>
@@ -189,7 +182,6 @@
                     <input type="text" placeholder="Enter your note">
                     <button class="remove-button" onclick="removeTask(this)">Remove</button>
                 </li>
-                <!-- Repeat for other notes -->
             </ul>
             <button onclick="addNote()">Add Note</button>
         </div>
@@ -234,6 +226,7 @@
             newTask.appendChild(removeButton);
             newTask.appendChild(subTaskList);
             list.appendChild(newTask);
+            updateTimeSlots();
         }
 
         function addSubTask(button) {
@@ -264,6 +257,25 @@
         function removeTask(button) {
             const task = button.parentElement;
             task.remove();
+            updateTimeSlots();
+        }
+
+        function updateTimeSlots() {
+            scheduleElement.innerHTML = '';
+            const numTasks = priorityTasksElement.children.length + todoTasksElement.children.length;
+            for (let i = 0; i < numTasks; i++) {
+                const timeSlot = document.createElement('div');
+                timeSlot.classList.add('time-slot');
+                const timeInput = document.createElement('input');
+                timeInput.type = 'text';
+                timeInput.placeholder = `Time Slot ${i + 1}`;
+                const scheduleInput = document.createElement('input');
+                scheduleInput.type = 'text';
+                scheduleInput.placeholder = `Task ${i + 1}`;
+                timeSlot.appendChild(timeInput);
+                timeSlot.appendChild(scheduleInput);
+                scheduleElement.appendChild(timeSlot);
+            }
         }
 
         function saveNotes() {
@@ -316,7 +328,7 @@
             const date = noteDateElement.value || localStorage.getItem('currentDate') || new Date().toISOString().split('T')[0];
             noteDateElement.value = date;
             const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
-            weekdayElement.innerText = `Weekday: ${dayOfWeek}`;
+            weekdayElement.innerText = dayOfWeek;
             for (let i = 0; i < scheduleElement.children.length; i++) {
                 const timeSlot = scheduleElement.children[i];
                 const timeInput = timeSlot.querySelector('input[type="text"]');
@@ -369,6 +381,7 @@
                 }
                 i++;
             }
+            updateTimeSlots();
         }
 
         function clearNotes() {
