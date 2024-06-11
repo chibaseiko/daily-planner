@@ -396,12 +396,28 @@
             noteDateElement.value = date;
             const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
             weekdayElement.innerText = dayOfWeek;
-            for (let i = 0; i < scheduleElement.children.length; i++) {
-                const timeSlot = scheduleElement.children[i];
-                const timeInput = timeSlot.querySelector('input[type="datetime-local"]');
-                const taskInput = timeSlot.querySelector('textarea');
-                timeInput.value = localStorage.getItem(`schedule-${date}-${i}-time`) || '';
-                taskInput.value = localStorage.getItem(`schedule-${date}-${i}-task`) || '';
+            scheduleElement.innerHTML = '';
+            let i = 0;
+            while (localStorage.getItem(`schedule-${date}-${i}-time`) !== null) {
+                const newDeadline = document.createElement('div');
+                newDeadline.classList.add('time-slot');
+                const clockIcon = document.createElement('span');
+                clockIcon.classList.add('clock-icon');
+                clockIcon.innerHTML = '⏰';
+                const timeInput = document.createElement('input');
+                timeInput.type = 'datetime-local';
+                timeInput.value = localStorage.getItem(`schedule-${date}-${i}-time`);
+                const taskInput = document.createElement('textarea');
+                taskInput.value = localStorage.getItem(`schedule-${date}-${i}-task`);
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.classList.add('task-checkbox');
+                newDeadline.appendChild(clockIcon);
+                newDeadline.appendChild(timeInput);
+                newDeadline.appendChild(taskInput);
+                newDeadline.appendChild(checkbox);
+                scheduleElement.appendChild(newDeadline);
+                i++;
             }
             loadList('priorityTasks', date);
             loadList('todoTasks', date);
